@@ -18,6 +18,4 @@ public interface ScoreBoardService {
 
     void finishMatch(Match match);
 
-    Integer getNumberOfActiveMatches();
-
 }

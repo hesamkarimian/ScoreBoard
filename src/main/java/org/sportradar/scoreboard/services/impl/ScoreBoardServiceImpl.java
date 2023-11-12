@@ -3,7 +3,6 @@ package org.sportradar.scoreboard.services.impl;
 import org.sportradar.scoreboard.entities.Match;
 import org.sportradar.scoreboard.services.ScoreBoardService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,8 +13,8 @@ public class ScoreBoardServiceImpl implements ScoreBoardService {
 
   private final List<Match> scoreBoard;
 
-  public ScoreBoardServiceImpl() {
-    this.scoreBoard = new ArrayList<>();
+  public ScoreBoardServiceImpl(List<Match> scoreBoard) {
+    this.scoreBoard = scoreBoard;
   }
 
   @Override
@@ -36,11 +35,6 @@ public class ScoreBoardServiceImpl implements ScoreBoardService {
   @Override
   public void finishMatch(Match match) {
 
-  }
-
-  @Override
-  public Integer getNumberOfActiveMatches() {
-    return scoreBoard.size();
   }
 
 }
