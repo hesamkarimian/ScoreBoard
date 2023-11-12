@@ -3,7 +3,6 @@ package org.sportradar.scoreboard.services;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.sportradar.scoreboard.entities.Match;
 import org.sportradar.scoreboard.exceptions.InvalidInputException;
 import org.sportradar.scoreboard.services.impl.ScoreBoardServiceImpl;
@@ -43,7 +42,7 @@ class ScoreBoardServiceTest {
     "Mexico, null",
     "Mexico, Blank"
   })
-  void startNewMatch_should_Throw_InvalidException_when_homeTeam_is_null(String firstParam, String secondParam) {
+  void startNewMatch_should_Throw_InvalidException_when_teamName_is_invalid(String firstParam, String secondParam) {
     int size = scoreBoard.size();
     if ("null".equals(firstParam)) {
       firstParam = null;
