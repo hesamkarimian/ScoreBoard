@@ -1,5 +1,6 @@
 package org.sportradar.scoreboard.services;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -19,8 +20,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 class ScoreBoardServiceTest {
 
-  List<Match> scoreBoard = new ArrayList<>();
-  private final ScoreBoardService scoreBoardService = new ScoreBoardServiceImpl(scoreBoard);
+  private List<Match> scoreBoard;
+  private ScoreBoardService scoreBoardService;
+
+  @BeforeEach
+  void init() {
+    scoreBoard = new ArrayList<>();
+    scoreBoardService = new ScoreBoardServiceImpl(scoreBoard);
+  }
 
   @Test
   void startNewMatch_should_Add_new_match_when_valid_input() {
@@ -46,12 +53,12 @@ class ScoreBoardServiceTest {
     int size = scoreBoard.size();
     if ("null".equals(firstParam)) {
       firstParam = null;
-    }else if("Blank".equals(firstParam)){
+    } else if ("Blank".equals(firstParam)) {
       firstParam = "   ";
     }
     if ("null".equals(secondParam)) {
       secondParam = null;
-    }else if("Blank".equals(secondParam)){
+    } else if ("Blank".equals(secondParam)) {
       secondParam = "   ";
     }
     String homeTeam = firstParam;
