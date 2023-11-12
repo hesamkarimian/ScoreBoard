@@ -1,6 +1,9 @@
 package org.sportradar.scoreboard.services;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.sportradar.scoreboard.entities.Match;
 import org.sportradar.scoreboard.exceptions.InvalidInputException;
 import org.sportradar.scoreboard.services.impl.ScoreBoardServiceImpl;
@@ -33,31 +36,28 @@ class ScoreBoardServiceTest {
     assertEquals(awayTeam, scoreBoard.get(size).getAwayTeam());
   }
 
-  @Test
-  void startNewMatch_should_Throw_InvalidException_when_homeTeam_is_null() {
+  @ParameterizedTest
+  @CsvSource({
+    "null, USA",
+    "Blank, USA",
+    "Mexico, null",
+    "Mexico, Blank"
+  })
+  void startNewMatch_should_Throw_InvalidException_when_homeTeam_is_null(String firstParam, String secondParam) {
     int size = scoreBoard.size();
-    assertThrows(InvalidInputException.class, () -> scoreBoardService.startNewMatch(null, "USA"));
-    assertEquals(size, scoreBoard.size());
-  }
-
-  @Test
-  void startNewMatch_should_Throw_InvalidException_when_homeTeam_is_blank() {
-    int size = scoreBoard.size();
-    assertThrows(InvalidInputException.class, () -> scoreBoardService.startNewMatch("  ", "USA"));
-    assertEquals(size, scoreBoard.size());
-  }
-
-  @Test
-  void startNewMatch_should_Throw_InvalidException_when_awayTeam_is_null() {
-    int size = scoreBoard.size();
-    assertThrows(InvalidInputException.class, () -> scoreBoardService.startNewMatch("Mexico", null));
-    assertEquals(size, scoreBoard.size());
-  }
-
-  @Test
-  void startNewMatch_should_Throw_InvalidException_when_awayTeam_is_Blank() {
-    int size = scoreBoard.size();
-    assertThrows(InvalidInputException.class, () -> scoreBoardService.startNewMatch("Mexico", "  "));
+    if ("null".equals(firstParam)) {
+      firstParam = null;
+    }else if("Blank".equals(firstParam)){
+      firstParam = "   ";
+    }
+    if ("null".equals(secondParam)) {
+      secondParam = null;
+    }else if("Blank".equals(secondParam)){
+      secondParam = "   ";
+    }
+    String homeTeam = firstParam;
+    String awayTeam = secondParam;
+    assertThrows(InvalidInputException.class, () -> scoreBoardService.startNewMatch(homeTeam, awayTeam));
     assertEquals(size, scoreBoard.size());
   }
 
