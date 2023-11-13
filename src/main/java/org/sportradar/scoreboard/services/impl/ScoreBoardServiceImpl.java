@@ -64,8 +64,9 @@ public class ScoreBoardServiceImpl implements ScoreBoardService {
   }
 
   @Override
-  public void finishMatch(Match match) {
-
+  public void finishMatch(String homeTeam, String awayTeam) {
+    Match match = findMatch(homeTeam, awayTeam);
+    scoreBoard.remove(match);
   }
 
 }

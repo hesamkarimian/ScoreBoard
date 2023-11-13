@@ -16,6 +16,6 @@ public interface ScoreBoardService {
 
     void updateScore(String homeTeam, int homeTeamScore, String awayTeam, int awayTeamScore);
 
-    void finishMatch(Match match);
+    void finishMatch(String homeTeam, String awayTeam);
 
 }
