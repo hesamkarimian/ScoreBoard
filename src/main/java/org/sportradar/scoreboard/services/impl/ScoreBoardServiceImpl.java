@@ -57,6 +57,9 @@ public class ScoreBoardServiceImpl implements ScoreBoardService {
   private Match findMatch(String homeTeam, String awayTeam) {
     Match match = new Match(homeTeam, awayTeam);
     int index = scoreBoard.indexOf(match);
+    if (index < 0) {
+      throw new InvalidInputException("Team Name");
+    }
     return scoreBoard.get(index);
   }
 

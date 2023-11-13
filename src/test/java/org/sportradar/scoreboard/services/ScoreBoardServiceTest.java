@@ -111,11 +111,10 @@ class ScoreBoardServiceTest {
     "0, 0",
     "0, -1"
   })
-  void updateScore_should_Throw_InvalidInputException_when_invalid_scores(String homeTeamScore, String awayTeamScore) {
+  void updateScore_should_Throw_InvalidInputException_when_invalid_scores(Integer homeTeamScore, Integer awayTeamScore) {
     scoreBoardService.startNewMatch("Mexico", "USA");
     assertThrows(InvalidInputException.class,
-                 () -> scoreBoardService.updateScore("Mexico", Integer.parseInt(homeTeamScore), "USA",
-                                                     Integer.parseInt(awayTeamScore)));
+                 () -> scoreBoardService.updateScore("Mexico", homeTeamScore, "USA", awayTeamScore));
   }
 
   @ParameterizedTest
@@ -133,6 +132,19 @@ class ScoreBoardServiceTest {
     scoreBoardService.updateScore(homeTeam, firstHomeTeamScore, awayTeam, firstAwayTeamScore);
     assertThrows(InvalidInputException.class,
                  () -> scoreBoardService.updateScore("Mexico", secondAwayTeamScore, "USA", secondHomeTeamScore));
+  }
+
+  @Test
+  void updateScore_should_ThrowException_when_Match_does_notExist() {
+    //GIVEN
+    String homeTeam = "Mexico";
+    String awayTeam = "USA";
+    scoreBoardService.startNewMatch(homeTeam, awayTeam);
+
+    //THEN
+    assertThrows(InvalidInputException.class,
+                 () -> scoreBoardService.updateScore("France", 5, "USA", 2));
+
   }
 
 }
