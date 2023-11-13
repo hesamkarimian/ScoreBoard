@@ -11,8 +11,7 @@ import org.sportradar.scoreboard.services.impl.ScoreBoardServiceImpl;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Hesam.Karimian
@@ -167,6 +166,39 @@ class ScoreBoardServiceTest {
 
     //THEN
     assertEquals(0, scoreBoard.size());
+  }
+
+  @Test
+  void getSummary_should_return_ordered_in_progress_matches() throws InterruptedException {
+    //GIVEN
+    scoreBoardService.startNewMatch("Mexico", "Canada");
+    scoreBoardService.updateScore("Mexico", 0, "Canada", 5);
+
+    Thread.sleep(10);
+    scoreBoardService.startNewMatch("Spain", "Brazil");
+    scoreBoardService.updateScore("Spain", 10, "Brazil", 2);
+
+    Thread.sleep(10);
+    scoreBoardService.startNewMatch("Germany", "France");
+    scoreBoardService.updateScore("Germany", 2, "France", 2);
+
+    Thread.sleep(10);
+    scoreBoardService.startNewMatch("Uruguay", "Italy");
+    scoreBoardService.updateScore("Uruguay", 6, "Italy", 6);
+
+    Thread.sleep(10);
+    scoreBoardService.startNewMatch("Argentina", "Australia");
+    scoreBoardService.updateScore("Argentina", 3, "Australia", 1);
+
+    //WHEN
+    List<Match> result = scoreBoardService.getSummary();
+    assertNotNull(result);
+    assertEquals(scoreBoard.size(), result.size());
+    assertEquals(scoreBoard.get(3), result.get(0));
+    assertEquals(scoreBoard.get(1), result.get(1));
+    assertEquals(scoreBoard.get(0), result.get(2));
+    assertEquals(scoreBoard.get(4), result.get(3));
+    assertEquals(scoreBoard.get(2), result.get(4));
   }
 
 }

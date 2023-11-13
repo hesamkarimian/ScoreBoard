@@ -4,6 +4,7 @@ import org.sportradar.scoreboard.entities.Match;
 import org.sportradar.scoreboard.exceptions.InvalidInputException;
 import org.sportradar.scoreboard.services.ScoreBoardService;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ public class ScoreBoardServiceImpl implements ScoreBoardService {
 
   @Override
   public List<Match> getSummary() {
-    return null;
+    return scoreBoard.stream().sorted(Comparator.reverseOrder()).toList();
   }
 
   @Override
