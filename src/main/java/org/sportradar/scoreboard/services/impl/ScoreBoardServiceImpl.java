@@ -39,7 +39,7 @@ public class ScoreBoardServiceImpl implements ScoreBoardService {
   }
 
   @Override
-  public void updateScore(Match match, int homeTeamScore, int awayTeamScore) {
+  public void updateScore(String homeTeam, int homeTeamScore, String awayTeam, int awayTeamScore) {
 
   }
 
