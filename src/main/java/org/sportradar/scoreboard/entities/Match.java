@@ -2,65 +2,43 @@ package org.sportradar.scoreboard.entities;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Hesam.Karimian
  * @since 12.11.2023
  */
-public class Match implements Comparable<Match> {
+public final class Match implements Comparable<Match> {
 
-  private String homeTeam;
-  private String awayTeam;
-  private Integer homeTeamScore;
-  private Integer awayTeamScore;
-  private Date matchTime;
+  private static final AtomicInteger globalId = new AtomicInteger(0);
 
-  public Match(String homeTeam, String awayTeam) {
+  private final Integer id;
+  private final Team homeTeam;
+  private final Team awayTeam;
+
+  public static Match getNewMatch(String homeTeamName, String awayTeamName) {
+    Team homeTeam = new Team(homeTeamName);
+    Team awayteam = new Team(awayTeamName);
+    Integer newId = globalId.incrementAndGet();
+    return new Match(newId, homeTeam, awayteam);
+  }
+
+  private Match(Integer id, Team homeTeam, Team awayTeam) {
+    this.id = id;
     this.homeTeam = homeTeam;
     this.awayTeam = awayTeam;
-    this.homeTeamScore = 0;
-    this.awayTeamScore = 0;
-    this.matchTime = new Date();
   }
 
-  public String getHomeTeam() {
-    return homeTeam;
+  public Integer getId() {
+    return id;
   }
 
-  public void setHomeTeam(String homeTeam) {
-    this.homeTeam = homeTeam;
+  public Team getHomeTeam() {
+    return new Team(homeTeam.getName(), homeTeam.getScore());
   }
 
-  public String getAwayTeam() {
-    return awayTeam;
-  }
-
-  public void setAwayTeam(String awayTeam) {
-    this.awayTeam = awayTeam;
-  }
-
-  public Integer getHomeTeamScore() {
-    return homeTeamScore;
-  }
-
-  public void setHomeTeamScore(Integer homeTeamScore) {
-    this.homeTeamScore = homeTeamScore;
-  }
-
-  public Integer getAwayTeamScore() {
-    return awayTeamScore;
-  }
-
-  public void setAwayTeamScore(Integer awayTeamScore) {
-    this.awayTeamScore = awayTeamScore;
-  }
-
-  public Date getMatchTime() {
-    return matchTime;
-  }
-
-  public void setMatchTime(Date matchTime) {
-    this.matchTime = matchTime;
+  public Team getAwayTeam() {
+    return new Team(awayTeam.getName(), awayTeam.getScore());
   }
 
   @Override
@@ -89,11 +67,11 @@ public class Match implements Comparable<Match> {
     if (compareResult != 0) {
       return compareResult;
     }
-    return this.getMatchTime().compareTo(o.getMatchTime());
+    return this.getId().compareTo(o.getId());
   }
 
   private Integer getMatchTotalScore() {
-    return this.getAwayTeamScore() + this.getHomeTeamScore();
+    return this.getAwayTeam().getScore() + this.getHomeTeam().getScore();
   }
 
 }
