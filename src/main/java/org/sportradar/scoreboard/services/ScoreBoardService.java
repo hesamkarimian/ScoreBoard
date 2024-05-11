@@ -20,7 +20,7 @@ public interface ScoreBoardService {
     List<Match> getSummary();
 
     /**
-     * Start a new match and add it to the score board
+     * Start a new match and save it to the score board
      * @param homeTeamName: name of the team that plays at home.
      * @param awayTeamName: name of the team that plays away.
      * @throws InvalidInputException if teamName is null or blank

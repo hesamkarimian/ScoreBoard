@@ -23,6 +23,12 @@ public final class Match implements Comparable<Match> {
     return new Match(newId, homeTeam, awayteam);
   }
 
+  public static Match getNewMatch(Match match, int homeTeamScore, int awayTeamScore) {
+    Team homeTeam = new Team(match.getHomeTeam().getName(), homeTeamScore);
+    Team awayteam = new Team(match.getAwayTeam().getName(), awayTeamScore);
+    return new Match(match.getId(), homeTeam, awayteam);
+  }
+
   private Match(Integer id, Team homeTeam, Team awayTeam) {
     this.id = id;
     this.homeTeam = homeTeam;
@@ -50,12 +56,14 @@ public final class Match implements Comparable<Match> {
       return false;
     }
     return Objects.equals(this.getAwayTeam(), that.getAwayTeam()) &&
-      Objects.equals(this.getHomeTeam(), that.getHomeTeam());
+           Objects.equals(this.getHomeTeam(), that.getHomeTeam()) ||
+           Objects.equals(this.getAwayTeam(), that.getHomeTeam()) &&
+           Objects.equals(this.getHomeTeam(), that.getAwayTeam()) ;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), getAwayTeam(), getHomeTeam());
+    return Objects.hash(super.hashCode(), getAwayTeam().getName(), getHomeTeam().hashCode());
   }
 
   @Override
