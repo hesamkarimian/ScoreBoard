@@ -44,4 +44,9 @@ public class ScoreBoardDAO {
         return scoreBoard.stream().sorted(Comparator.reverseOrder()).toList();
     }
 
+    public Optional<Match> findByTeam(String name) {
+        return scoreBoard.stream()
+                .filter(m -> m.getHomeTeam().getName().equalsIgnoreCase(name)
+                             || m.getAwayTeam().getName().equalsIgnoreCase(name)).findFirst();
+    }
 }

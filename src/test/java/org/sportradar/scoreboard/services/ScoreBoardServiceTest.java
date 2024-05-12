@@ -6,8 +6,8 @@ import org.sportradar.scoreboard.ScoreBoardDAO;
 import org.sportradar.scoreboard.entities.Match;
 import org.sportradar.scoreboard.entities.Team;
 import org.sportradar.scoreboard.exceptions.DuplicateMatchException;
-import org.sportradar.scoreboard.exceptions.InvalidInputException;
 import org.sportradar.scoreboard.exceptions.MatchNotFoundException;
+import org.sportradar.scoreboard.exceptions.NotAllowedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,17 @@ class ScoreBoardServiceTest {
     }
 
     @Test
-    void startNewMatch_should_ThrowDuplicateMatchException_When_a_match_exist_with_same_teams() {
+    void startNewMatch_should_ThrowException_When_A_team_has_a_match_on_board() {
+        scoreBoardService.startNewMatch("Mexico", "USA");
+        assertThrows(NotAllowedException.class,
+                () -> scoreBoardService.startNewMatch("France", "USA"));
+
+        assertThrows(NotAllowedException.class,
+                () -> scoreBoardService.startNewMatch("Mexico", "France"));
+    }
+
+    @Test
+    void startNewMatch_should_ThrowDuplicateMatchException_When_a_Return_match_exists() {
         scoreBoardService.startNewMatch("Mexico", "USA");
         assertThrows(DuplicateMatchException.class,
                 () -> scoreBoardService.startNewMatch("USA", "Mexico"));
@@ -66,12 +76,16 @@ class ScoreBoardServiceTest {
     void startNewMatch_should_Throw_InvalidInputException_when_HomeTeamName_is_nullOrEmpty() {
         int initialSize = scoreBoard.size();
 
-        assertThrows(InvalidInputException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> scoreBoardService.startNewMatch(null, "USA"));
         assertEquals(initialSize, scoreBoard.size());
 
-        assertThrows(InvalidInputException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> scoreBoardService.startNewMatch("", "USA"));
+        assertEquals(initialSize, scoreBoard.size());
+
+        assertThrows(IllegalArgumentException.class,
+                () -> scoreBoardService.startNewMatch("   ", "USA"));
         assertEquals(initialSize, scoreBoard.size());
     }
 
@@ -79,11 +93,11 @@ class ScoreBoardServiceTest {
     void startNewMatch_should_Throw_InvalidInputException_when_AwayTeamName_is_nullOrEmpty() {
         int initialSize = scoreBoard.size();
 
-        assertThrows(InvalidInputException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> scoreBoardService.startNewMatch("USA", null));
         assertEquals(initialSize, scoreBoard.size());
 
-        assertThrows(InvalidInputException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> scoreBoardService.startNewMatch("USA", " "));
         assertEquals(initialSize, scoreBoard.size());
     }
@@ -112,9 +126,15 @@ class ScoreBoardServiceTest {
     }
 
     @Test
-    void updateScore_should_Throw_IllegalArgumentException_when_id_notValid() {
+    void updateScore_should_Throw_IllegalArgumentException_when_id_Is_Null() {
         assertThrows(IllegalArgumentException.class,
                 () -> scoreBoardService.updateScore(null, 5, 2));
+    }
+
+    @Test
+    void updateScore_should_Throw_IllegalArgumentException_when_negative_id() {
+        assertThrows(IllegalArgumentException.class,
+                () -> scoreBoardService.updateScore(-1, 5, 2));
     }
 
     @Test
@@ -164,6 +184,37 @@ class ScoreBoardServiceTest {
     }
 
     @Test
+    void finishMatch_should_ThrowException_when_Match_id_null() {
+        assertThrows(IllegalArgumentException.class,
+                () -> scoreBoardService.finishMatch(null));
+    }
+
+    @Test
+    void finishMatch_should_ThrowException_when_Match_id_negative() {
+        assertThrows(IllegalArgumentException.class,
+                () -> scoreBoardService.finishMatch(-10));
+    }
+
+    @Test
+    void finishMatch_should_ThrowException_when_Match_id_Zero() {
+        assertThrows(IllegalArgumentException.class,
+                () -> scoreBoardService.finishMatch(0));
+    }
+
+    @Test
+    void finishMatch_should_ThrowException_when_call_finish_twoTimes() {
+        //GIVEN
+        int id = scoreBoardService.startNewMatch("USA", "France");
+
+        //WHEN
+        scoreBoardService.finishMatch(id);
+
+        //THEN
+        assertThrows(MatchNotFoundException.class,
+                () -> scoreBoardService.finishMatch(id));
+    }
+
+    @Test
     void finishMatch_should_remove_Match_when_Match_Exist() {
         //GIVEN
         int id = scoreBoardService.startNewMatch("USA", "France");
@@ -210,4 +261,14 @@ class ScoreBoardServiceTest {
         assertEquals(scoreBoardDAO.findById(id3).get(), result.get(4));
     }
 
+    @Test
+    void getSummary_should_return_Immutable_list() {
+        //GIVEN
+        int id1 = scoreBoardService.startNewMatch("Mexico", "Canada");
+
+        //WHEN
+        List<Match> result = scoreBoardService.getSummary();
+        assertThrows(UnsupportedOperationException.class, () -> result.remove(1));
+        assertThrows(UnsupportedOperationException.class, () -> result.add(Match.getNewMatch("USA", "France")));
+    }
 }

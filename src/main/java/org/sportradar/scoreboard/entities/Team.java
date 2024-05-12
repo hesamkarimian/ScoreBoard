@@ -9,7 +9,7 @@ import java.util.Objects;
 public final class Team {
 
     private final String name;
-    private Integer score;
+    private final Integer score;
 
     public Team(String name) {
         this.name = name;
@@ -27,10 +27,6 @@ public final class Team {
 
     public Integer getScore() {
         return score;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
     }
 
     @Override
