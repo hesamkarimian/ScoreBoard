@@ -25,13 +25,13 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class ScoreBoardServiceTest {
 
-    private Set<Match> scoreBoard;
+    private List<Match> scoreBoard;
     private ScoreBoardDAO scoreBoardDAO;
     private ScoreBoardService scoreBoardService;
 
     @BeforeEach
     void init() {
-        scoreBoard = new HashSet<>();
+        scoreBoard = new ArrayList<>();
         scoreBoardDAO = new ScoreBoardDAO(scoreBoard);
         scoreBoardService = new ScoreBoardServiceImpl(scoreBoardDAO);
     }
@@ -94,9 +94,9 @@ class ScoreBoardServiceTest {
     }
 
     @Test
-    void startNewMatch_should_Throw_InvalidInputException_when_BothTeams_are_similar() {
+    void startNewMatch_should_Throw_IllegalArgumentException_when_BothTeams_are_similar() {
         int initialSize = scoreBoard.size();
-        assertThrows(InvalidInputException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> scoreBoardService.startNewMatch("USA", "USA"));
         assertEquals(initialSize, scoreBoard.size());
     }
@@ -116,29 +116,28 @@ class ScoreBoardServiceTest {
         assertEquals(2, match.getAwayTeam().getScore());
     }
 
-  @Test
-  void updateScore_should_Throw_InvalidInputException_when_id() {
-    assertThrows(IllegalArgumentException.class,
-                 () -> scoreBoardService.updateScore(null, 5, 2));
-  }
-
+    @Test
+    void updateScore_should_Throw_IllegalArgumentException_when_id_notValid() {
+        assertThrows(IllegalArgumentException.class,
+                () -> scoreBoardService.updateScore(null, 5, 2));
+    }
 
     @Test
-    void updateScore_should_Throw_InvalidInputException_when_Negative_scores() {
+    void updateScore_should_Throw_IllegalArgumentException_when_Negative_scores() {
         Integer id = scoreBoardService.startNewMatch("Mexico", "USA");
         assertThrows(IllegalArgumentException.class,
                 () -> scoreBoardService.updateScore(id, -1, 0));
     }
 
-  @Test
-  void updateScore_should_Throw_InvalidInputException_when_update_To_Zero_scores() {
-    Integer id = scoreBoardService.startNewMatch("Mexico", "USA");
-    assertThrows(IllegalArgumentException.class,
-            () -> scoreBoardService.updateScore(id, 0, 0));
-  }
+    @Test
+    void updateScore_should_Throw_IllegalArgumentException_when_update_To_Zero_scores() {
+        Integer id = scoreBoardService.startNewMatch("Mexico", "USA");
+        assertThrows(IllegalArgumentException.class,
+                () -> scoreBoardService.updateScore(id, 0, 0));
+    }
 
     @Test
-    void updateScore_should_Throw_InvalidInputException_when_update_to_current_score() {
+    void updateScore_should_Throw_IllegalArgumentException_when_update_to_current_score() {
         Integer id = scoreBoardService.startNewMatch("Mexico", "USA");
         scoreBoardService.updateScore(id, 3, 3);
         assertThrows(IllegalArgumentException.class,
@@ -146,10 +145,10 @@ class ScoreBoardServiceTest {
     }
 
     @Test
-    void updateScore_should_Throw_InvalidInputException_when_Second_scores_are_lower() {
+    void updateScore_should_Throw_IllegalArgumentException_when_Second_scores_are_lower() {
         int id = scoreBoardService.startNewMatch("Mexico", "USA");
         scoreBoardService.updateScore(id, 2, 2);
-        assertThrows(InvalidInputException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> scoreBoardService.updateScore(id, 1, 2));
     }
 
@@ -165,51 +164,55 @@ class ScoreBoardServiceTest {
 
     @Test
     void finishMatch_should_ThrowException_when_Match_does_notExist() {
-        assertThrows(InvalidInputException.class,
+        assertThrows(MatchNotFoundException.class,
                 () -> scoreBoardService.finishMatch(10));
     }
 
     @Test
     void finishMatch_should_remove_Match_when_Match_Exist() {
         //GIVEN
-        String homeTeam = "USA";
-        String awayTeam = "France";
-        int id = scoreBoardService.startNewMatch(homeTeam, awayTeam);
+        int id = scoreBoardService.startNewMatch("USA", "France");
 
         //WHEN
         scoreBoardService.finishMatch(id);
 
         //THEN
+        assertTrue(scoreBoardDAO.findById(id).isEmpty());
         assertEquals(0, scoreBoard.size());
     }
 
     @Test
-    void getSummary_should_return_ordered_in_progress_matches() throws InterruptedException {
+    void getSummary_should_return_ordered_in_progress_matches() {
         //GIVEN
-        int id = scoreBoardService.startNewMatch("Mexico", "Canada");
-        scoreBoardService.updateScore(id, 0, 5);
+        int id1 = scoreBoardService.startNewMatch("Mexico", "Canada");
+        scoreBoardService.updateScore(id1, 0, 5);
 
-        id = scoreBoardService.startNewMatch("Spain", "Brazil");
-        scoreBoardService.updateScore(id, 10, 2);
+        int id2 = scoreBoardService.startNewMatch("Spain", "Brazil");
+        scoreBoardService.updateScore(id2, 10, 2);
 
-        id = scoreBoardService.startNewMatch("Germany", "France");
-        scoreBoardService.updateScore(id, 2, 2);
+        int id3 = scoreBoardService.startNewMatch("Germany", "France");
+        scoreBoardService.updateScore(id3, 2, 2);
 
-        id = scoreBoardService.startNewMatch("Uruguay", "Italy");
-        scoreBoardService.updateScore(id, 6, 6);
+        int id4 = scoreBoardService.startNewMatch("Uruguay", "Italy");
+        scoreBoardService.updateScore(id4, 6, 6);
 
-        id = scoreBoardService.startNewMatch("Argentina", "Australia");
-        scoreBoardService.updateScore(id, 3, 1);
+        int id5 = scoreBoardService.startNewMatch("Argentina", "Australia");
+        scoreBoardService.updateScore(id5, 3, 1);
 
         //WHEN
         List<Match> result = scoreBoardService.getSummary();
-//    assertNotNull(result);
-//    assertEquals(scoreBoard.size(), result.size());
-//    assertEquals(scoreBoard.get(3), result.get(0));
-//    assertEquals(scoreBoard.get(1), result.get(1));
-//    assertEquals(scoreBoard.get(0), result.get(2));
-//    assertEquals(scoreBoard.get(4), result.get(3));
-//    assertEquals(scoreBoard.get(2), result.get(4));
+        assertNotNull(result);
+        assertEquals(scoreBoard.size(), result.size());
+        assertTrue(scoreBoardDAO.findById(id4).isPresent());
+        assertEquals(scoreBoardDAO.findById(id4).get(), result.get(0));
+        assertTrue(scoreBoardDAO.findById(id2).isPresent());
+        assertEquals(scoreBoardDAO.findById(id2).get(), result.get(1));
+        assertTrue(scoreBoardDAO.findById(id1).isPresent());
+        assertEquals(scoreBoardDAO.findById(id1).get(), result.get(2));
+        assertTrue(scoreBoardDAO.findById(id5).isPresent());
+        assertEquals(scoreBoardDAO.findById(id5).get(), result.get(3));
+        assertTrue(scoreBoardDAO.findById(id3).isPresent());
+        assertEquals(scoreBoardDAO.findById(id3).get(), result.get(4));
     }
 
 }

@@ -46,7 +46,7 @@ public final class Team {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getName());
+        return Objects.hash(getName());
     }
 
 }

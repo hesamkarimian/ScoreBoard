@@ -2,6 +2,7 @@ package org.sportradar.scoreboard;
 
 import org.sportradar.scoreboard.entities.Match;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -12,9 +13,9 @@ import java.util.Set;
  */
 public class ScoreBoardDAO {
 
-    private final Set<Match> scoreBoard;
+    private final List<Match> scoreBoard;
 
-    public ScoreBoardDAO(Set<Match> scoreBoard) {
+    public ScoreBoardDAO(List<Match> scoreBoard) {
         this.scoreBoard = scoreBoard;
     }
 
@@ -24,7 +25,16 @@ public class ScoreBoardDAO {
     }
 
     public void save(Match match) {
-        scoreBoard.add(match);
+        int index = scoreBoard.indexOf(match);
+        if (index >= 0) {
+            scoreBoard.set(index, match);
+        } else {
+            scoreBoard.add(match);
+        }
+    }
+
+    public void delete(Match match) {
+        scoreBoard.remove(match);
     }
 
     public Optional<Match> findById(Integer matchId) {
@@ -42,8 +52,7 @@ public class ScoreBoardDAO {
     }
 
     public List<Match> findByAll() {
-//        return scoreBoard; //stream().sorted(Comparator.reverseOrder()).toList()
-        return List.of();
+        return scoreBoard.stream().sorted(Comparator.reverseOrder()).toList();
     }
 
 }

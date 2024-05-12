@@ -15,15 +15,15 @@ import java.util.List;
  */
 public class ScoreBoardServiceImpl implements ScoreBoardService {
 
-    private final ScoreBoardDAO scoreBoard;
+    private final ScoreBoardDAO scoreBoardDAO;
 
-    public ScoreBoardServiceImpl(ScoreBoardDAO scoreBoard) {
-        this.scoreBoard = scoreBoard;
+    public ScoreBoardServiceImpl(ScoreBoardDAO scoreBoardDAO) {
+        this.scoreBoardDAO = scoreBoardDAO;
     }
 
     @Override
     public List<Match> getSummary() {
-        return scoreBoard.findByAll();
+        return scoreBoardDAO.findByAll();
     }
 
     @Override
@@ -33,7 +33,7 @@ public class ScoreBoardServiceImpl implements ScoreBoardService {
         validateDifferentTeamNames(homeTeamName, awayTeamName);
         Match newMatch = Match.getNewMatch(homeTeamName, awayTeamName);
         validateNoDuplicate(newMatch);
-        scoreBoard.save(newMatch);
+        scoreBoardDAO.save(newMatch);
         return newMatch.getId();
     }
 
@@ -59,21 +59,28 @@ public class ScoreBoardServiceImpl implements ScoreBoardService {
             throw new IllegalArgumentException("Team Scores can not be lower that previous scores.");
         }
         if (homeTeamScore + awayTeamScore == match.getHomeTeam().getScore() + match.getAwayTeam().getScore()) {
-            throw new IllegalArgumentException("Team Scores can not be lower that previous scores.");
+            throw new IllegalArgumentException("Team Scores can not be similar to previous scores.");
         }
         Match updatedMath = Match.getNewMatch(match, homeTeamScore, awayTeamScore);
-        scoreBoard.save(updatedMath);
+        scoreBoardDAO.save(updatedMath);
     }
 
     private void validateNoDuplicate(Match match) {
-        scoreBoard.findByMatch(match).ifPresent(m ->
+        scoreBoardDAO.findByMatch(match).ifPresent(m ->
         {
+            throw new DuplicateMatchException(match.getHomeTeam().getName(), match.getAwayTeam().getName());
+        });
+        scoreBoardDAO.findByMatch(getReverseMatch(match)).ifPresent(match1 -> {
             throw new DuplicateMatchException(match.getHomeTeam().getName(), match.getAwayTeam().getName());
         });
     }
 
+    private static Match getReverseMatch(Match match) {
+        return Match.getNewMatch(match.getAwayTeam().getName(), match.getHomeTeam().getName());
+    }
+
     private Match findMatch(Integer matchId) {
-        return scoreBoard.findById(matchId)
+        return scoreBoardDAO.findById(matchId)
                 .orElseThrow(() -> new MatchNotFoundException(matchId));
     }
 
@@ -89,8 +96,8 @@ public class ScoreBoardServiceImpl implements ScoreBoardService {
 
     @Override
     public void finishMatch(Integer matchId) {
-//    Match match = findMatch(homeTeam, awayTeam);
-//    scoreBoard.remove(match);
+    Match match = findMatch(matchId);
+    scoreBoardDAO.delete(match);
     }
 
 }

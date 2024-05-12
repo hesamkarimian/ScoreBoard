@@ -56,14 +56,12 @@ public final class Match implements Comparable<Match> {
       return false;
     }
     return Objects.equals(this.getAwayTeam(), that.getAwayTeam()) &&
-           Objects.equals(this.getHomeTeam(), that.getHomeTeam()) ||
-           Objects.equals(this.getAwayTeam(), that.getHomeTeam()) &&
-           Objects.equals(this.getHomeTeam(), that.getAwayTeam()) ;
+           Objects.equals(this.getHomeTeam(), that.getHomeTeam()) ;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), getAwayTeam().getName(), getHomeTeam().hashCode());
+    return Objects.hash(getAwayTeam(), getHomeTeam());
   }
 
   @Override
@@ -71,15 +69,15 @@ public final class Match implements Comparable<Match> {
     if (o == null) {
       return 1;
     }
-    int compareResult = this.getMatchTotalScore().compareTo(o.getMatchTotalScore());
+    int compareResult = getMatchTotalScore(this).compareTo(o.getMatchTotalScore(o));
     if (compareResult != 0) {
       return compareResult;
     }
     return this.getId().compareTo(o.getId());
   }
 
-  private Integer getMatchTotalScore() {
-    return this.getAwayTeam().getScore() + this.getHomeTeam().getScore();
+  private Integer getMatchTotalScore(Match team) {
+    return team.getAwayTeam().getScore() + team.getHomeTeam().getScore();
   }
 
 }
