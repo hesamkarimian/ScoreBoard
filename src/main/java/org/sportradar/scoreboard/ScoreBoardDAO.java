@@ -19,11 +19,6 @@ public class ScoreBoardDAO {
         this.scoreBoard = scoreBoard;
     }
 
-    public int getNumberOfGames() {
-//        return scoreBoard.size();
-        return 0;
-    }
-
     public void save(Match match) {
         int index = scoreBoard.indexOf(match);
         if (index >= 0) {
@@ -39,12 +34,6 @@ public class ScoreBoardDAO {
 
     public Optional<Match> findById(Integer matchId) {
         return scoreBoard.stream().filter(m -> m.getId().equals(matchId)).findFirst();
-    }
-
-    public Optional<Match> findByTeams(String homeTeam, String awayTeam) {
-//        Match match = Match.getNewMatch(homeTeam, awayTeam);
-//        return scoreBoard.stream().filter(m -> m.equals(match)).findFirst();
-        return Optional.empty();
     }
 
     public Optional<Match> findByMatch(Match match) {

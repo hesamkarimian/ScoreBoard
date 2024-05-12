@@ -2,20 +2,15 @@ package org.sportradar.scoreboard.services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.sportradar.scoreboard.ScoreBoardDAO;
 import org.sportradar.scoreboard.entities.Match;
 import org.sportradar.scoreboard.entities.Team;
 import org.sportradar.scoreboard.exceptions.DuplicateMatchException;
 import org.sportradar.scoreboard.exceptions.InvalidInputException;
 import org.sportradar.scoreboard.exceptions.MatchNotFoundException;
-import org.sportradar.scoreboard.services.impl.ScoreBoardServiceImpl;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,7 +28,7 @@ class ScoreBoardServiceTest {
     void init() {
         scoreBoard = new ArrayList<>();
         scoreBoardDAO = new ScoreBoardDAO(scoreBoard);
-        scoreBoardService = new ScoreBoardServiceImpl(scoreBoardDAO);
+        scoreBoardService = new ScoreBoardService(scoreBoardDAO);
     }
 
     @Test
